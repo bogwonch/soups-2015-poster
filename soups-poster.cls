@@ -587,7 +587,8 @@
 
 \if@ll
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesClass{sig-alternate} [2007/06/07 - V2.3 - based on acmproc.cls V1.3 <Nov. 30 '99>]
+  %\ProvidesClass{sig-alternate} [2007/06/07 - V2.3 - based on acmproc.cls V1.3 <Nov. 30 '99>]
+  \ProvidesClass{soups-poster}
   \RequirePackage{latexsym}% QUERY: are these two really needed?
   \let\dooptions\ProcessOptions
 \else
