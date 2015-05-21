@@ -5,7 +5,7 @@
 
 \usepackage{booktabs}
 \usepackage{pifont}
-\newcommand{\xmark}{\ding{55}}
+\newcommand{\xmark}{{\footnotesize\ding{55}}}
 \usepackage{lmodern}
 
 \newcommand{\etal}[0]{et~al.\@ }
@@ -40,7 +40,7 @@
 \pagestyle{plain}
 
 \usepackage{makecell}% http://ctan.org/pkg/makecell
-\renewcommand{\rothead}[2][30]{\rlap{\makebox[4mm][l]{\rotatebox{#1}{\makecell[c]{\textsf{#2}}}}}}%
+\renewcommand{\rothead}[2][30]{\rlap{\makebox[4mm][l]{\rotatebox{#1}{\makecell[c]{\footnotesize \textsf{#2}}}}}}%
 
 \begin{document}
 
@@ -48,7 +48,7 @@
 \numberofauthors{2}
 \author{%
   \alignauthor{}
-  Joseph Hallett\thanks{With thanks to Igor Muttik at McAfee and N{.}~Asokan at Aalto University for sharing their data and discussions.}\\
+  Joseph Hallett\thanks{With thanks to Igor Muttik at McAfee for sharing Android malware reports and N{.}~Asokan at Aalto University for sharing their Carat data and discussions.}\\
   \affaddr{University of Edinburgh}\\
   \email{joseph.hallett@sms.ed.ac.uk}
   \alignauthor{}
@@ -84,15 +84,14 @@ These could be shared with others or used in organisation-wide curated app store
 
 We use the AppPAL authorization logic~\citep{Hallett:2014un}, a version of SecPAL~\citep{Becker:2006vh}, to write policies with a precise semantics.
 AppPAL describes policies for an app to be installable.
-Statements in AppPAL are relative to specific principals,
-enabling delegation relationships to be expressed.
+Statements are relative to specific principals, enabling delegation relationships to be expressed.
 Delegation is natural in the app store setting: it captures trust relationships among the users, the stores, the developers, and security vendors who vet apps.
 
 Alice, a user, can state that an app is installable:
 \begin{lstlisting}
   "alice" says "com.rovio.angrybirds" isInstallable.
 \end{lstlisting}
-She can specify that an app is only installable if some constraint (a fact checkable by inspecting the app or through static analysis) is true.
+She can specify that an app is only installable if some constraint (checkable by inspecting the app or through static analysis) is true.
 She can also delegate parts of the decision to third parties.
 They must state specific facts about the app for Alice to accept them.
 For example, suppose Alice only wants apps without the \texttt{LOCATION} permission,
@@ -103,11 +102,13 @@ She trusts McAfee to decide whether the \emph{not-malware} policy is met:
     if "not-malware-policy" isMetBy(App)
     where hasPermission(App, "LOCATION") = False.
 
-  "alice" says "mcafee" can-say 0
+  "alice" says "mcafee" can-say
     "not-malware-policy" isMetBy(App).
 \end{lstlisting}
+
 Our AppPAL prototype is implemented as a Java library and runs on the
 Java and Dalvik virtual machines.
+\vfill
 
 \section{Policies}
 
@@ -120,9 +121,12 @@ We wrote AppPAL policies to describe each of these behaviours as
 increasing sets of permissions:
 % The policies are of increasing strictness, each banning more permissions.
 
+\newcommand{\tabtitle}[1]{\textbf{\footnotesize #1}}
 \begin{center}
-  \begin{tabular}{ r l l l l }\footnotesize
-                                       & \rothead{Conservative} & \rothead{Advanced} & \rothead{Fencesitter} & \rothead{Unconcerned} \\
+  \begin{tabular}{ r l l l l }
+%                                       & \rothead{Conservative} & \rothead{Advanced} & \rothead{Fencesitter} & \rothead{Unconcerned} \\
+    \toprule
+    \tabtitle{Policy} & \tabtitle{C}             & \tabtitle{A} & \tabtitle{F} & \tabtitle{U} \\
     \midrule
     \lstinline{GET_ACCOUNTS}           & \xmark{}               & \xmark{}           & \xmark{}              & \xmark{}              \\
     \lstinline{ACCESS_FINE_LOCATION}   & \xmark{}               & \xmark{}           & \xmark{}              &                       \\
@@ -171,7 +175,7 @@ characterising users who allow dangerous apps or those who install merely ``unsa
 \begin{lstlisting}
 "user" says "mcafee" can-say "malware" isKindOf(App).
 "mcafee" says "trojan" can-act-as "malware".
-"mcafee" says "pus" can-act-as "malware".
+"mcafee" says "pup" can-act-as "malware".
 \end{lstlisting}
 
 % We also add two additional policies.
@@ -194,7 +198,8 @@ characterising users who allow dangerous apps or those who install merely ``unsa
 
 \section{Experiments}
 
-We aim to demonstrate AppPAL as a language for modelling and describing app installation policies.
+
+We aim to demonstrate AppPAL as a language for modelling app installation policies.
 We want to measure how far users enforce app installation policies informally.
 Users have opinions about apps~\citep{Sadeh:2014vq}: but are they acting on them?
 
@@ -214,13 +219,13 @@ Using this data, and the apps themselves taken from the Google Play Store and An
 \subsection{Results}
 
 \begin{figure}[!ht]\centering
-  \includegraphics[width=1.0\linewidth]{./tables/lin.eps}
+  \includegraphics[width=0.9\linewidth]{./tables/lin.eps}
   \caption{Use of policies modelling user behaviour.}
   \label{fig:lin}
 \end{figure}
 
 \begin{figure}[!ht]\centering
-  \includegraphics[width=1.0\linewidth]{./tables/malware.eps}
+  \includegraphics[width=0.9\linewidth]{./tables/malware.eps}
   \caption{Percentage of malware in installed apps for users installing some malicious apps.}
   \label{fig:malware}
 \end{figure}
@@ -236,6 +241,8 @@ We found 1\% of the users had a PUP or malicious app installed.
 Figure~\ref{fig:malware} shows that infection rates for PUPs and malware is small. 
 A user is 3 times more likely to have a PUP installed than malware.
 Only 9 users had both a PUP and malware installed.
+Users who were complying more than half the time with the conservative or advanced policies complied with the malware or PUP policies fully.
+This suggests that users who pick their apps carefully are less likely to experience malware.
 
 \section{Discussion}
 
@@ -256,7 +263,6 @@ Some limitations of our results include:
   Permissions tend to increase in apps over time~\citep{Wei:2012id}; so a user may actually be more conservative than our analysis suggests.
   % We might find the apps allowed are more permissive now than when th
   %user installed them. %% SO: what is effect on results?
-  This may cause a reduction in compliance with a policy.
 \end{itemize}
 
 To avoid these limitations, we want to test policies out directly with users, and to explore more complex policies dynamically.  
