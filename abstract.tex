@@ -173,7 +173,8 @@ Other categories classify PUPs (potentially unwanted programs) such as aggressiv
 Using AppPAL we can write policies to differentiate between different kinds of malware,
 characterising users who allow dangerous apps or those who install merely ``unsavoury'' apps.
 \begin{lstlisting}
-"user" says "mcafee" can-say "malware" isKindOf(App).
+"user" says "mcafee" can-say 
+  "malware" isKindOf(App).
 "mcafee" says "trojan" can-act-as "malware".
 "mcafee" says "pup" can-act-as "malware".
 \end{lstlisting}
