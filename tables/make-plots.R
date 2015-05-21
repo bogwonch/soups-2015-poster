@@ -20,7 +20,7 @@ lin__ <- lin_[lin_$installs > 20,]
 lin___ <- lin__[,1:5]
 
 d_lin <- melt(lin___, id.vars=c(1))
-p_lin <- ggplot(d_lin, aes(x=value, fill=variable)) + geom_histogram(binwidth=0.05)
+p_lin <- ggplot(d_lin, aes(x=value, fill=variable)) + geom_histogram( position="dodge")
 update_labels(p_lin, list(x="Percentage of users apps meeting policy", y="Stacked user count", color="Policy"))
 dev.off()
 
@@ -33,7 +33,7 @@ bad__ <- bad_[bad_$installs > 20,]
 bad___ <- bad__[,1:3]
 
 d_bad <- melt(bad___, id.vars=c(1))
-p_bad <- ggplot(d_bad, aes(x=value, fill=variable)) + geom_histogram(binwidth=0.02, position="dodge") + ylim(0,175) + xlim(0.7, 0.9999) # + scale_y_sqrt()
+p_bad <- ggplot(d_bad, aes(x=value, fill=variable)) + geom_histogram(binwidth=0.02, position="dodge") + ylim(0,150) + xlim(0.7, 0.9999) # + scale_y_sqrt()
 update_labels(p_bad, list(x="Percentage of users apps meeting policy", y="User count", color="Policy"))
 dev.off()
 
