@@ -8,7 +8,7 @@
 \newcommand{\xmark}{\ding{55}}
 \usepackage{lmodern}
 
-\newcommand{\etal}[0]{et{.}~al{.}}
+\newcommand{\etal}[0]{et~al.\@ }
 \newcommand{\citep}[1]{\cite{#1}}
 
 \usepackage{listings}
@@ -25,7 +25,7 @@
 }
 \newcommand{\code}[2][]{\lstinline[#1]{#2}}
 % Autoref line numebers
-\providecommand*{\lstnumberautorefname}{line} 
+\providecommand*{\lstnumberautorefname}{line}
 % SecPAL
 \lstdefinelanguage{apppal}{%
   morekeywords={says,if,where,False,True},%
@@ -35,8 +35,8 @@
 \lstset{language=apppal}
 
 \usepackage{graphicx}
-\renewcommand{\topfraction}{0.99} % be more aggressive about text around floats
-\renewcommand{\floatpagefraction}{0.99}
+%\renewcommand{\topfraction}{0.99} % be more aggressive about text around floats
+%\renewcommand{\floatpagefraction}{0.99}
 \pagestyle{plain}
 
 \usepackage{makecell}% http://ctan.org/pkg/makecell
@@ -63,54 +63,67 @@
 
 Mobile devices let users pick the apps they want to run.
 App stores offer a wide range of software for users to choose.
-Users decide which apps to use based on their own preferences as well as security and privacy policies.
+Users decide which apps to use based on their own preferences as well as security and privacy policies. % DA: overloading "policies" is confusing, do you mean Android policies here?
+          % or informal user policies?  what preferences do you mean?  (preferences is in title of [5] so feels like allusion to that, which means personal privacy preferences)
 Sometimes this is based on what the store shows them first~\citep{Prata:2012in}.
-Sometimes it is based on information about the app---the ratings and permissions they requests~\citep{Kelley:2013kc}.
+Sometimes it is based on information about the app---the ratings and permissions they
+request~\citep{Kelley:2013kc}.
 
 Users fall into patterns when picking apps~\citep{Sadeh:2014vq}.
-By capturing these policies explicitly they can be enforced by a machine.
-This lessens the burden on users to decide which apps they want.
-Whilst some expert users could write their own policies formally, others
-just want help.  By sharing policies users can gain the benefits of expert
-written security policies without having to become experts themselves
+By capturing these patterns explicitly as policies they can be enforced
+automatically, reducing the burden on users to decide which apps they want.
+Security-savvy users (or professionals) may design policies themselves
+to share with others (or use in organisation-wide curated app stores).
+
+% others
+% just want help.  By sharing policies users can gain the benefits of expert
+%
+% written security policies without having to become experts themselves
 
 \section{AppPAL}
 
-We have used the AppPAL authorization logic~\citep{Hallett:2014un} to write policies.
-AppPAL (based on SecPAL~\citep{Becker:2006vh}) can describe a policy for an app to be installable. 
-AppPAL statements are made by principals.
-This enables delegation relationships to be expressed in policies.
-Delegation is natural in the app store setting. 
-Trust relationships are made amongst the users, the stores, the developers, and security vendors vetting apps in the stores.
-AppPAL is implemented as a Java library and runs on the Java and Dalvik virtual machines.
+We use the AppPAL authorization logic~\citep{Hallett:2014un}, a version
+of SecPAL~\citep{Becker:2006vh}, to write policies with a precise semantics.
+AppPAL describes policies for an app to be installable.
+Statements in AppPAL are relative to specific principals,
+enabling delegation relationships to be expressed.
+Delegation is natural in the app store setting: it
+captures trust relationships among the users,
+the stores, the developers, and security vendors who vet apps.
 
 Alice, a user, can state that an app is installable:
 \begin{lstlisting}
-"alice" says "com.rovio.angrybirds" isInstallable.
+  "alice" says "com.rovio.angrybirds" isInstallable.
 \end{lstlisting}
-She can specify that an app is only installable if a constraint (fact checkable by inspecting the app or through static analysis) is true.
+She can specify that an app is only installable if some constraint (a fact checkable by inspecting the app or through static analysis) is true.
 She can also delegate parts of the decision to third parties.
 They must state specific facts about the app for Alice to accept them.
-For example Alice only wants apps without the \texttt{LOCATION} permission that meet her \emph{not-malware} policy.
-She trusts McAfee to decide whether the \emph{not-malware} policy is met.
+For example, suppose Alice only wants apps without the \texttt{LOCATION} permission,
+and satisfying her \emph{not-malware} requirement.
+She trusts McAfee to decide whether the \emph{not-malware} policy is met:
 \begin{lstlisting}
-"alice" says App isInstallable
-  if "not-malware-policy" isMetBy(App)
-  where hasPermission(App, "LOCATION") = False.
+  "alice" says App isInstallable
+    if "not-malware-policy" isMetBy(App)
+    where hasPermission(App, "LOCATION") = False.
 
-"alice" says "mcafee" can-say 0
-  "not-malware-policy" isMetBy(App).
+  "alice" says "mcafee" can-say 0
+    "not-malware-policy" isMetBy(App).
 \end{lstlisting}
+Our AppPAL prototype is implemented as a Java library and runs on the
+Java and Dalvik virtual machines.
 
 \section{Policies}
 
-Lin~\etal{} showed that users fall into four patterns when thinking about apps~\citep{Sadeh:2014vq}.  
-Conservative users are uncomfortable allowing an app access to any personal data for any reason.
-Unconcerned users felt okay allowing access to most data for almost any reason.  
-Advanced users were comfortable allowing apps access to location data but not if it was for advertising reasons.
-Fence sitters (the largest cluster) were broadly against collection of personal data for advertising purposes but opinions varied.
-We wrote AppPAL policies to describe each of these behaviours as a simplification of~\citep{Sadeh:2014vq}.
-The policies are of increasing strictness, each banning more permissions.
+In a user study of XX Android users,  %% RIGHT?
+Lin~\etal found four patterns that characterise
+user privacy preferences for apps~\citep{Sadeh:2014vq}.
+The \emph{Conservative} users are uncomfortable allowing an app access to any personal data for any reason.
+The \emph{Unconcerned} users felt okay allowing access to most data for almost any reason.
+The \emph{Advanced} users were comfortable allowing apps access to location data but not if it was for advertising reasons.
+The largest cluster, \emph{Fence Sitters} were broadly against collection of personal data for advertising purposes but opinions varied.
+We wrote AppPAL policies to describe each of these behaviours as
+increasing sets of permissions:
+% The policies are of increasing strictness, each banning more permissions.
 
 \begin{center}
   \begin{tabular}{ r l l l l }\footnotesize
@@ -126,39 +139,45 @@ The policies are of increasing strictness, each banning more permissions.
   \end{tabular}
 \end{center}
 
+%% DA: want to emphasise it is not just about simple sets of permissions.
+These simplify the patterns discovered. %~\citep{Sadeh:2014vq}.
+But AppPAL constraints
+can describe richer policies than permission sets.
+
 % \begin{lstlisting}
 % User says "unconcerned-policy" isMetBy(App)
 %   if app isAnApp
-%   where 
+%   where
 %     hasPermission(App, "GET_ACCOUNTS") = False.
-%         
+%
 % User says "fencesitter-policy" isMetBy(App)
 %   if "unconcerned-policy" isMetBy(App)
-%   where 
+%   where
 %     hasPermission(App, "ACCESS_FINE_LOCATION") = False,
 %     hasPermission(App, "READ_CONTACT") = False.
 %
 % User says "advanced-policy" isMetBy(App)
 %   if "fencesitter-policy" isMetBy(App)
-%   where 
+%   where
 %     hasPermission(App, "READ_PHONE_STATE") = False,
 %     hasPermission(App, "SEND_SMS") = False,
 %
 % User says "conservative-policy" isMetBy(App)
 %   if "advanced-policy" isMetBy(App)
-%   where 
+%   where
 %     hasPermission(App, "ACCESS_COARSE_LOCATION") = False.
 % \end{lstlisting}
 
-McAfee classify malware into several categories. 
+Like other vendors, McAfee classify malware into several categories.
 The \emph{malicious} and \emph{trojan} categories describe traditional malware.
-There are other categories for PUS (potentially unwanted software).
-Using AppPAL we can write policies to differentiate between different kinds of malware.
-This lets us explore the difference between users who install dangerous apps and those who happen to install unsavoury apps.
+Other categories classify PUPs (potentially unwanted programs) % Let's use McAfee term, not Google
+such as aggressive adware.
+Using AppPAL we can write policies to differentiate between different kinds of malware,
+characterising users who allow dangerous apps or those who install merely ``unsavoury'' apps.
 \begin{lstlisting}
-User says McAfee can-say "malware" isKindOf(App).
-McAfee says "trojan" can-act-as "malware".
-McAfee says "pus" can-act-as "malware".
+"user" says "mcafee" can-say "malware" isKindOf(App).
+"mcafee" says "trojan" can-act-as "malware".
+"mcafee" says "pus" can-act-as "malware".
 \end{lstlisting}
 
 % We also add two additional policies.
@@ -181,35 +200,24 @@ McAfee says "pus" can-act-as "malware".
 
 \section{Experiments}
 
-We aim to demonstrate AppPAL as a language for modelling and describing app installation policies. 
-We want to measure the extent users currently enforce app installation policies.
+We aim to demonstrate AppPAL as a language for modelling and describing app installation policies.
+We want to measure how far users enforce app installation policies informally.
 Users have opinions about apps~\citep{Sadeh:2014vq}: but are they acting on them?
 
 \subsection{Methodology}
 
-We want to test how well these policies capture user behavior.
-Installation data was taken from a large, partially anonymized\footnote{Users are replaced with incrementing numbers, app names with hashes.}, database of installed apps~\citep{Oliner:2013ht}.
-By calculating the hash of a package name we can see who installed what.
+We want to test how well policies capture user behavior.
+Installation data was taken from a partially anonymized\footnote{Users are replaced with incrementing numbers, app names are replaced with hashes to protect sensitive names.} database of installed apps captured by Carat~\citep{Oliner:2013ht}.
+By calculating the hash of known package names we can see who installed what.
+%
+The initial database has over 90,000 apps and 55,000 users.
+On average each user installed around 90 apps each; 4,300 apps have known names.
 
-From an initial database of over 90,000 apps, and 55,000 users.
-On average each user installed around 90 apps each, we unmasked 4,300 apps.
-Disregarding system apps (such as \texttt{com.android.vending}) and very common apps\footnote{Specifically Facebook, Dropbox, Whatsapp, and Twitter.} we reduced the set to an average of twenty apps per user.
-We then removed users for whom we knew less than 20 apps; for whom we didn't have a representative sample of installations.
-Using this data, and the apps themselves taken from the Google Play Store and Android Observatory~\citep{Barrera:2012iba} we checked which apps satisfied which policies.
-
-Our assumptions include:
-\begin{itemize}
-  \item 
-    Downloaded apps used for experiments are not the same version as those used by users.
-    Installed apps may have different permissions to the ones we looked at.
-    Permissions tend to increase in apps over time~\citep{Wei:2012id}. 
-    We might find the apps allowed are more permissive now than when the user installed them.
-
-  \item We do not have the full user purchase history.
-    We could only unmask a subset of installed apps.
-    A user may have apps installed that break the policy, but which
-    we do not know.  This is a limitation of the Carat data set.
-\end{itemize}
+Disregarding system apps (such as \texttt{com.android.vending}) and very common apps (Facebook, Dropbox, Whatsapp, and Twitter) we reduced the set to an average of 20 known apps per user.
+To see some variations in app type, we considered users who have more than 20 known apps.
+%% HOW MANY?
+% We removed users for whom we knew less than 20 ; for whom we didn't have a representative sample of installations.
+Using this data, and the apps themselves taken from the Google Play Store and Android Observatory~\citep{Barrera:2012iba}, we checked which apps satisfied which policies.
 
 \subsection{Results}
 
@@ -230,6 +238,8 @@ In Figure~\ref{fig:lin} we can see that whilst the majority of users rarely
 follow these policies there are a few users who do seem to be installing apps on
 the basis of these policies most of the time.
 This suggests that while users may have privacy preferences the majority are not attempting to enforce them.
+%% HOW MANY ARE?  SHOULD GIVE SOME NUMBER FOR e.g.
+% We found XX out of 60,000 had >80% compliance.
 
 We found 2\% of the users had a PUS or malicious app installed.
 In Figure~\ref{fig:malware} we see that of those users with a malicious app
@@ -240,19 +250,36 @@ installed PUS accounts for around half of the malware infections.
 Most users seem to use apps irrespective of how uncomfortable they are with the permissions they request.
 A small set of users do seem to enforce these policies at least some of the time however.
 Exploring where this disconnect comes from is an avenue for future research.
-Do users not understand the relationship between apps and permissions~\citep{Felt:2012hma}.
-Is enforcing them too difficult?
+Do users not understand the relationship between apps and permissions~\citep{Felt:2012hma}?
+Is enforcing them informally too difficult?
 
+We claim that AppPAL can capture the differences in informal user
+policies. % AppPAL can filter apps on the basis of these policies.
+Using AppPAL we have written short policies describing user behaviour
+and used these to identify the users following them to varying degrees.
+Some limitations of our results include:
+\begin{itemize}
+\item We do not have the full user purchase history, and we can only
+  find out about apps whose names match those in available
+  databases.  % unmask a subset of installed apps.
+  So a user may have apps installed
+  that break the policy without us knowing.
+  % This is a   limitation of the Carat data set.
+\item Recently downloaded apps used for experiment may not be the same version
+  that users had, in particular, their permissions may differ.
+  Permissions tend to increase in apps over time~\citep{Wei:2012id};
+  so a user may actually be more conservative than our analysis suggests.
+  % We might find the apps allowed are more permissive now than when th
+  %user installed them. %% SO: what is effect on results?
+\end{itemize}
 
-AppPAL can capture the differences in user policies.
-AppPAL can filter apps on the basis of these policies.  
-Using AppPAL we have written short policies describing user behaviour and been able to identify users following them to varying degrees.
-
-Next steps will involve a trial creating an app store for Android with AppPAL
-built in.  This will allow us to trial policies with users; and begin testing
-more complex policies dynamically.  To begin testing AppPAL we plan an Android
-app where a user can check their currently installed apps against several
-policies.
+To avoid these limitations, we want to test policies out directly with
+users, and to explore more complex policies dynamically.  We will do
+this in two ways.  First, by providing an Android app for AppPAL where
+a user can check their currently installed apps against predefined
+(perhaps downloadable) policies.  Second, we want to enable
+automatically-curated app stores for Android that are parameterised on
+AppPAL policies.
 
 \bibliographystyle{plain}
 \bibliography{abstract}
