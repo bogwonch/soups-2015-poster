@@ -24,7 +24,7 @@
   commentstyle=\ttfamily\color{Gray}
 }
 \newcommand{\code}[2][]{\lstinline[#1]{#2}}
-% Autoref line numebers
+% Autoref line numbers
 \providecommand*{\lstnumberautorefname}{line}
 % SecPAL
 \lstdefinelanguage{apppal}{%
@@ -60,7 +60,6 @@
 \maketitle
 
 \section{Introduction}
-
 
 Mobile devices let users pick the apps they want to run.
 App stores offer a wide range of software for users to choose.
@@ -207,7 +206,7 @@ Users have opinions about apps~\citep{Sadeh:2014vq}: but are they acting on them
 
 We want to test how well policies capture user behavior.
 Installation data was taken from a partially anonymized\footnote{Users are replaced with incrementing numbers, app names are replaced with hashes to protect sensitive names.} database of installed apps captured by Carat~\citep{Oliner:2013ht}.
-By calculating the hash of known package names we can see who installed what.
+By calculating the hash of known package names we see who installed what.
 %
 The initial database has over 90,000 apps and 55,000 users.
 On average each user installed around 90 apps each; 4,300 apps have known names.
@@ -230,8 +229,8 @@ Using this data, and the apps themselves taken from the Google Play Store and An
   \label{fig:malware}
 \end{figure}
 
-Figure~\ref{fig:lin} shows that the majority of users rarely follow these policies.
-There are, however, a few users who do seem to be installing apps on the basis of these policies most of the time.
+Figure~\ref{fig:lin} shows that the very few users follow these policies,
+but a few users who do seem to be installing apps meeting these policies most of the time.
 For the unconcerned policy (the most permissive) only 1,606 users (4\%) had 50\% compliance;
   and only 120 users (0.3\%) had 80\% compliance.
 For the stricter conservative policy only 60 users were complying half the time, and just 7 more than 80\% of the time.
@@ -242,7 +241,7 @@ Figure~\ref{fig:malware} shows that infection rates for PUPs and malware is smal
 A user is 3 times more likely to have a PUP installed than malware.
 Only 9 users had both a PUP and malware installed.
 Users who were complying more than half the time with the conservative or advanced policies complied with the malware or PUP policies fully.
-This suggests that users who pick their apps carefully are less likely to experience malware.
+This is significant\footnote{P-value: $2.2\times10^{-16}$.} and suggests that users who pick their apps carefully are less likely to experience malware.
 
 \section{Discussion}
 
